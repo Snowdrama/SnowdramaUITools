@@ -26,21 +26,16 @@ namespace Snowdrama.UI
         public float rowHeight = 40;
 
         [Header("Debug")]
-        public RectTransform rectTransform;
         public int rowCount = 0;
         public float percentWidth;
         public float percentHeight;
-        public float rectTransformWidth;
-        public float rectTransformHeight;
 
         void LateUpdate()
         {
             if (transform.childCount != children.Count || forceUpdate)
             {
-                Validate();
                 CollectChildren();
                 CalculateValues();
-                rectTransform = this.GetComponent<RectTransform>();
                 children.Clear();
                 foreach (Transform child in transform)
                 {
@@ -88,18 +83,9 @@ namespace Snowdrama.UI
         private void CalculateValues()
         {
             rowCount = Mathf.CeilToInt((float)children.Count / (float)columnCount);
-            rectTransformHeight = rowCount * rowHeight;
-            rectTransform.anchorMin = new Vector2(0, 1);
-            rectTransform.anchorMax = new Vector2(1, 1);
-            rectTransform.sizeDelta = new Vector2(0, rectTransformHeight);
 
             percentWidth = 1.0f / (float)columnCount;
             percentHeight = 1.0f / (float)rowCount;
-        }
-
-        private void Validate()
-        {
-            rectTransform = this.GetComponent<RectTransform>();
         }
 
         private void CollectChildren()

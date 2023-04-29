@@ -33,7 +33,9 @@ namespace Snowdrama.UI
         {
             if (transform.childCount != children.Count || forceUpdate)
             {
+                forceUpdate = false;
                 CollectChildren();
+                CalculateValues();
                 if (children.Count > 0)
                 {
                     int index = 0;

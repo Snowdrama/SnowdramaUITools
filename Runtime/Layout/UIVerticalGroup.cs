@@ -34,23 +34,9 @@ namespace Snowdrama.UI
         {
             if (transform.childCount != children.Count || forceUpdate)
             {
+                forceUpdate = false;
                 CollectChildren();
                 CalculateValues();
-                children.Clear();
-                foreach (Transform child in transform)
-                {
-                    if (useActive)
-                    {
-                        if (child.gameObject.activeSelf)
-                        {
-                            children.Add(child.GetComponent<RectTransform>());
-                        }
-                    }
-                    else
-                    {
-                        children.Add(child.GetComponent<RectTransform>());
-                    }
-                }
                 if (children.Count > 0)
                 {
                     for (int y = 0; y < rowCount; y++)

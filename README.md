@@ -1,7 +1,7 @@
-# SnowdramaUIRouterTools
-Simple tools for sorting and sizing UI
+# Snowdrama UI Tools
+Simple tools for managing UI layouts
 
-![Unity_BWMovydRcX](https://user-images.githubusercontent.com/1271916/159188089-17dc87a8-73b5-4cda-807b-c25ba3507e94.gif)
+![Example of Unity UI Tools](https://raw.githubusercontent.com/Snowdrama/SnowdramaUITools/main/Screenshot.png)
 
 # Requirements & Disclaimer
 In theory it works with earlier versions but I have tested against 2020.3.19f1(current LTS version) but I have it set to work with 2019.1 and over so there may be issues if you're using 2019. 

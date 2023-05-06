@@ -1,183 +1,217 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Snowdrama.UI
 {
+    /// <summary>
+    /// This class fits all the children into the current RectTransform
+    /// </summary>
     [ExecuteInEditMode]
-    public class UIGrid : MonoBehaviour
+    public class UIGrid : SnowUI
     {
-        [System.Serializable]
-        public struct GridCell
+
+        [Header("Grid Settings")]
+        public int numberOfRows = 0;
+        public int numberOfColumns = 0;
+        void LateUpdate()
         {
-            public Color color;
-            public int cellId;
-            public int width;
-            public int height;
-            //unity uses for anchors
-            public Vector2Int bottomLeftCell;
-            public Vector2Int topRightCell;
-        }
-
-        public Sprite palette;
-        public Sprite styleSprite;
-
-        private Dictionary<Color, int> paletteList = new Dictionary<Color, int>();
-
-        [Header("Cell Padding")]
-        public float topPadding = 0.0f;
-        public float botPadding = 0.0f;
-        public float leftPadding = 0.0f;
-        public float rightPadding = 0.0f;
-
-        private int width;
-        private int height;
-        private float percentWidthCell;
-        private float percentHeightCell;
-        private Dictionary<int, GridCell> gridCells = new Dictionary<int, GridCell>();
-        private List<RectTransform> children = new List<RectTransform>();
-
-        [Header("Debug")]
-        public bool forceUpdate = false;
-        private List<Color> debugPaletteKeys = new List<Color>();
-        private List<int> debugPaletteValues = new List<int>();
-
-        private List<int> debugKeys = new List<int>();
-        private List<GridCell> debugCells = new List<GridCell>();
-
-#if UNITY_EDITOR
-        // Start is called before the first frame update
-        void Start()
-        {
-            forceUpdate = true;
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            if (forceUpdate || transform.childCount != children.Count)
+            if (transform.childCount != children.Count || forceUpdate)
             {
-                UpdateGrid();
+                forceUpdate = false;
+                CollectChildren();
+                CalculateGrid(children.Count, numberOfColumns, numberOfRows);
+                ProcessChildren();
             }
         }
 
-        private void UpdateGrid()
-        {
 
-            forceUpdate = false;
-            int paletteIndex = -1;
-            if (palette == null || styleSprite == null)
-            {
-                return;
-            }
-            for (int y = 0; y < palette.texture.height; y++)
-            {
-                for (int x = 0; x < palette.texture.width; x++)
-                {
-                    var color = palette.texture.GetPixel(x, y);
-                    if (!paletteList.ContainsKey(color) && color.a >= 1.0f)
-                    {
-                        paletteList.Add(color, paletteIndex);
-                        paletteIndex++;
-                    }
-                }
-            }
-            debugPaletteKeys = new List<Color>(paletteList.Keys);
-            debugPaletteValues = new List<int>(paletteList.Values);
+        //enum GridMode
+        //{
+        //    ColumnsFirst,
+        //    RowsFirst,
+        //}
+        //enum GridMode_Columns
+        //{
+        //    Left_To_Right,
+        //    Right_To_Left,
+        //}
+        //enum GridMode_Rows
+        //{
+        //    Top_To_Bottom,
+        //    Bottom_To_Top,
+        //}
+        //[Header("Columns & Rows")]
+        //[Range(1, 10)]
+        //[SerializeField] private int columnCount = 1;
+        //[Range(1, 10)]
+        //[SerializeField] private int rowCount = 1;
 
-            //we assume a grid is always square so take the first row/column
-            percentHeightCell = 1.0f / styleSprite.texture.height;
-            percentWidthCell = 1.0f / styleSprite.texture.width;
+        //private float anchorGapX = 0.01f;
+        //private float anchorGapY = 0.01f;
+        //private float percentWidth;
+        //private float percentHeight;
 
-            gridCells.Clear();
-            for (int y = 0; y < styleSprite.texture.height; y++)
-            {
-                for (int x = 0; x < styleSprite.texture.width; x++)
-                {
-                    int cellID = -1;
-                    var colorKey = styleSprite.texture.GetPixel(x, y);
-                    if (paletteList.ContainsKey(colorKey))
-                    {
-                        cellID = paletteList[colorKey];
-                    }
-                    if (cellID >= 0)
-                    {
-                        if (gridCells.ContainsKey(cellID))
-                        {
-                            //a grid already exists for this
-                            GridCell cell = gridCells[cellID];
-                            cell.color = colorKey;
-                            if (x < cell.bottomLeftCell.x)
-                            {
-                                cell.bottomLeftCell.x = x;
-                            }
-                            if (y < cell.bottomLeftCell.y)
-                            {
-                                cell.bottomLeftCell.x = y;
-                            }
+        //[Header("Grid Direction")]
+        //[SerializeField] private GridMode gridMode;
+        //[SerializeField] private GridMode_Columns columnMode;
+        //[SerializeField] private GridMode_Rows rowMode;
+        //[Header("Active Items")]
+        //[Tooltip("Active ")]
+        //public bool useActive;
+        //[Header("Force Update")]
+        //public bool forceUpdate = false;
+        //[Header("Children")]
+        //public List<RectTransform> children = new List<RectTransform>();
+        //// Start is called before the first frame update
+        //void Start()
+        //{
 
-                            if (x + 1 > cell.topRightCell.x)
-                            {
-                                cell.topRightCell.x = x + 1;
-                            }
-                            if (y + 1 > cell.topRightCell.y)
-                            {
-                                cell.topRightCell.y = y + 1;
-                            }
-                            cell.width = cell.topRightCell.x - cell.bottomLeftCell.x;
-                            cell.height = cell.topRightCell.y - cell.bottomLeftCell.y;
-                            gridCells[cellID] = cell;
-                        }
-                        else
-                        {
-                            GridCell tempCell = new GridCell();
-                            tempCell.color = colorKey;
-                            tempCell.cellId = cellID;
-                            tempCell.bottomLeftCell = new Vector2Int(x, y);
-                            tempCell.topRightCell = new Vector2Int(x + 1, y + 1);
-                            gridCells.Add(cellID, tempCell);
-                        }
-                    }
-                }
-            }
-            debugKeys = new List<int>(gridCells.Keys);
-            debugCells = new List<GridCell>(gridCells.Values);
+        //}
 
-            for (int i = 0; i < gridCells.Keys.Count; i++)
-            {
-                if (!gridCells.ContainsKey(i))
-                {
-                    Debug.LogErrorFormat("Grid cells skip index {0}!", i);
-                    Debug.Log("Skipped Cells", this.gameObject);
-                    return;
-                }
-            }
+        //// Update is called once per frame
+        //void Update()
+        //{
 
-            children.Clear();
-            foreach (Transform child in transform)
-            {
-                children.Add(child.GetComponent<RectTransform>());
-            }
+        //    if (transform.childCount != children.Count || forceUpdate == true)
+        //    {
+        //        children.Clear();
+        //        foreach (Transform child in transform)
+        //        {
+        //            if (useActive)
+        //            {
+        //                if (child.gameObject.activeSelf)
+        //                {
+        //                    children.Add(child.GetComponent<RectTransform>());
+        //                }
+        //            }
+        //            else
+        //            {
+        //                children.Add(child.GetComponent<RectTransform>());
+        //            }
+        //        }
+        //        if (children.Count > 0)
+        //        {
+        //            if (children.Count > (rowCount * columnCount))
+        //            {
+        //                Debug.LogError("Grid has more items than columns and rows");
+        //            }
+        //            percentWidth = 1.0f / columnCount;
+        //            percentHeight = 1.0f / rowCount;
 
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (gridCells.ContainsKey(i))
-                {
-                    GridCell cell = gridCells[i];
 
-                    children[i].anchorMin = new Vector2(
-                        cell.bottomLeftCell.x * percentWidthCell,
-                        cell.bottomLeftCell.y * percentHeightCell
-                        );
-                    children[i].anchorMax = new Vector2(
-                        cell.topRightCell.x * percentWidthCell,
-                        cell.topRightCell.y * percentHeightCell
-                        );
-                    children[i].offsetMin = new Vector2(leftPadding, botPadding);
-                    children[i].offsetMax = new Vector2(-rightPadding, -topPadding);
-                }
-            }
-        }
-#endif
+        //            if (columnMode == GridMode_Columns.Left_To_Right)
+        //            {
+        //                if (rowMode == GridMode_Rows.Top_To_Bottom)
+        //                {
+        //                    if (gridMode == GridMode.ColumnsFirst)
+        //                    {
+        //                        LTR_TTB();
+        //                    }
+        //                    else
+        //                    {
+        //                        TTB_LTR();
+        //                    }
+        //                }
+        //                else if (rowMode == GridMode_Rows.Bottom_To_Top)
+        //                {
+        //                    if (gridMode == GridMode.ColumnsFirst)
+        //                    {
+        //                        LTR_BTT();
+        //                    }
+        //                    else
+        //                    {
+        //                        BTT_LTR();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            //Debug.LogError("Grid contains no items to align must have at least one");
+        //        }
+        //    }
+        //}
+
+        ////ColumnsFirst Left-To-Right then Top-To-Bottom
+        //public void LTR_TTB()
+        //{
+        //    float percentWidth_WithGap = percentWidth - (anchorGapX / 2);
+        //    float percentHeight_WithGap = percentHeight - (anchorGapX / 2);
+        //    for (int yPos = 0; yPos < rowCount; yPos++)
+        //    {
+        //        for (int xPos = 0; xPos < columnCount; xPos++)
+        //        {
+        //            int index = xPos + (yPos * columnCount);
+        //            if (index < children.Count)
+        //            {
+        //                float minX = (percentWidth * (xPos + 0)) + (anchorGapX / 2.0f);
+        //                float minY = 1 - (percentHeight * (yPos + 1)) + (anchorGapY / 2.0f);
+
+        //                float maxX = (percentWidth * (xPos + 1)) - (anchorGapX / 2.0f);
+        //                float maxY = 1 - (percentHeight * (yPos + 0)) - (anchorGapY / 2.0f);
+        //                children[index].anchorMin = new Vector2(minX, minY);
+        //                children[index].anchorMax = new Vector2(maxX, maxY);
+        //                children[index].offsetMin = new Vector2(0, 0);
+        //                children[index].offsetMax = new Vector2(0, 0);
+        //            }
+        //        }
+        //    }
+        //}
+        ////RowsFirst Top-To-Bottom then Left-To-Right
+        //public void TTB_LTR()
+        //{
+        //    for (int xPos = 0; xPos < columnCount; xPos++)
+        //    {
+        //        for (int yPos = 0; yPos < rowCount; yPos++)
+        //        {
+        //            int index = yPos + (xPos * columnCount);
+        //            if (index < children.Count)
+        //            {
+        //                children[index].anchorMin = new Vector2(percentWidth * (xPos + 0), 1 - percentHeight * (yPos + 1));
+        //                children[index].anchorMax = new Vector2(percentWidth * (xPos + 1), 1 - percentHeight * (yPos + 0));
+        //                children[index].offsetMin = new Vector2(0, 0);
+        //                children[index].offsetMax = new Vector2(0, 0);
+        //            }
+        //        }
+        //    }
+        //}
+
+        ////Left-To-Right Bottom-To-Top
+        //public void LTR_BTT()
+        //{
+        //    for (int yPos = 0; yPos < rowCount; yPos++)
+        //    {
+        //        for (int xPos = 0; xPos < columnCount; xPos++)
+        //        {
+        //            int index = xPos + (yPos * columnCount);
+        //            if (index < children.Count)
+        //            {
+        //                children[index].anchorMin = new Vector2(percentWidth * (xPos + 0), percentHeight * (yPos + 0));
+        //                children[index].anchorMax = new Vector2(percentWidth * (xPos + 1), percentHeight * (yPos + 1));
+        //                children[index].offsetMin = new Vector2(0, 0);
+        //                children[index].offsetMax = new Vector2(0, 0);
+        //            }
+        //        }
+        //    }
+        //}
+        ////RowsFirst Bottom-To-Top then Left-To-Right
+        //public void BTT_LTR()
+        //{
+        //    for (int yPos = 0; yPos < rowCount; yPos++)
+        //    {
+        //        for (int xPos = 0; xPos < columnCount; xPos++)
+        //        {
+        //            int index = xPos + (yPos * columnCount);
+        //            if (index < children.Count)
+        //            {
+        //                children[index].anchorMin = new Vector2(percentWidth * (xPos + 0), percentHeight * (yPos + 0));
+        //                children[index].anchorMax = new Vector2(percentWidth * (xPos + 1), percentHeight * (yPos + 1));
+        //                children[index].offsetMin = new Vector2(0, 0);
+        //                children[index].offsetMax = new Vector2(0, 0);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

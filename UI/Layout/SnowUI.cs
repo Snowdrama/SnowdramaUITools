@@ -45,6 +45,15 @@ namespace Snowdrama.UI
         private float percentWidth;
         private float percentHeight;
 
+
+        private void OnEnable()
+        {
+            if (_children == null)
+            {
+                _children = new List<RectTransform>();
+            }
+        }
+
         protected void ProcessCell(int x, int y, int index)
         {
             if (index < children.Count)

@@ -12,6 +12,8 @@ namespace Snowdrama.UI
         [Header("Active Items")]
         public bool forceActiveIfInactive = false;
         public bool useActive;
+        protected int currentActiveCount = 0;
+        protected int tempActiveCount = 0;
 
         [Header("UI Update Direction")]
         public UIDirection direction = UIDirection.ColumnsFirst;
@@ -51,6 +53,22 @@ namespace Snowdrama.UI
             if (_children == null)
             {
                 _children = new List<RectTransform>();
+            }
+        }
+
+
+        public virtual void LateUpdate()
+        {
+            if (useActive)
+            {
+                tempActiveCount = 0;
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    if (transform.GetChild(i).gameObject.activeSelf)
+                    {
+                        tempActiveCount++;
+                    }
+                }
             }
         }
 

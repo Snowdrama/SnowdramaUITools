@@ -13,14 +13,17 @@ namespace Snowdrama.UI
     {
         [Header("Horizonal Settings")]
         public int numberOfColumns = 0;
-        void LateUpdate()
+        public override void LateUpdate()
         {
-            if (transform.childCount != children.Count || forceUpdate)
+            base.LateUpdate();
+            if (transform.childCount != children.Count || forceUpdate || currentActiveCount != tempActiveCount)
             {
-                forceUpdate = false;
                 CollectChildren();
                 CalculateRows(children.Count, numberOfColumns);
                 ProcessChildren();
+
+                forceUpdate = false;
+                currentActiveCount = tempActiveCount;
             }
         }
     }

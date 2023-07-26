@@ -14,14 +14,16 @@ namespace Snowdrama.UI
         [Header("Grid Settings")]
         public int numberOfRows = 0;
         public int numberOfColumns = 0;
-        void LateUpdate()
+        public override void LateUpdate()
         {
-            if (transform.childCount != children.Count || forceUpdate)
+            base.LateUpdate();
+            if (transform.childCount != children.Count || forceUpdate || currentActiveCount != tempActiveCount)
             {
-                forceUpdate = false;
                 CollectChildren();
                 CalculateGrid(children.Count, numberOfColumns, numberOfRows);
                 ProcessChildren();
+                forceUpdate = false;
+                currentActiveCount = tempActiveCount;
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Snowdrama.UI
@@ -39,11 +40,12 @@ namespace Snowdrama.UI
 
         [Header("Debug")]
         public bool forceUpdate = false;
-        private List<Color> debugPaletteKeys = new List<Color>();
-        private List<int> debugPaletteValues = new List<int>();
+        
+        [SerializeField, EditorReadOnly] private List<Color> debugPaletteKeys = new List<Color>();
+        [SerializeField, EditorReadOnly] private List<int> debugPaletteValues = new List<int>();
 
-        private List<int> debugKeys = new List<int>();
-        private List<GridCell> debugCells = new List<GridCell>();
+        [SerializeField, EditorReadOnly] private List<int> debugKeys = new List<int>();
+        [SerializeField, EditorReadOnly] private List<GridCell> debugCells = new List<GridCell>();
 
 #if UNITY_EDITOR
         // Start is called before the first frame update
@@ -70,6 +72,7 @@ namespace Snowdrama.UI
             {
                 return;
             }
+            paletteList.Clear();
             for (int y = 0; y < palette.texture.height; y++)
             {
                 for (int x = 0; x < palette.texture.width; x++)
@@ -82,8 +85,8 @@ namespace Snowdrama.UI
                     }
                 }
             }
-            debugPaletteKeys = new List<Color>(paletteList.Keys);
-            debugPaletteValues = new List<int>(paletteList.Values);
+            debugPaletteKeys = paletteList.Keys.ToList();
+            debugPaletteValues = paletteList.Values.ToList();
 
             //we assume a grid is always square so take the first row/column
             percentHeightCell = 1.0f / styleSprite.texture.height;

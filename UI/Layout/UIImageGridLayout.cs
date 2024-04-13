@@ -152,7 +152,7 @@ namespace Snowdrama.UI
                 {
                     Debug.LogErrorFormat("Grid cells skip index {0}!", i);
                     Debug.Log("Skipped Cells", this.gameObject);
-                    return;
+                    break;
                 }
             }
 

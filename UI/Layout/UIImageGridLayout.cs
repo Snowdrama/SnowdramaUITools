@@ -26,17 +26,17 @@ namespace Snowdrama.UI
         private Dictionary<Color, int> paletteList = new Dictionary<Color, int>();
 
         [Header("Cell Padding")]
-        public float topPadding = 0.0f;
-        public float botPadding = 0.0f;
-        public float leftPadding = 0.0f;
-        public float rightPadding = 0.0f;
+        [SerializeField] public float topPadding = 0.0f;
+        [SerializeField] public float botPadding = 0.0f;
+        [SerializeField] public float leftPadding = 0.0f;
+        [SerializeField] public float rightPadding = 0.0f;
 
-        private int width;
-        private int height;
-        private float percentWidthCell;
-        private float percentHeightCell;
-        private Dictionary<int, GridCell> gridCells = new Dictionary<int, GridCell>();
-        private List<RectTransform> children = new List<RectTransform>();
+        [SerializeField, EditorReadOnly] private int width;
+        [SerializeField, EditorReadOnly] private int height;
+        [SerializeField, EditorReadOnly] private float percentWidthCell;
+        [SerializeField, EditorReadOnly] private float percentHeightCell;
+        [SerializeField, EditorReadOnly] private Dictionary<int, GridCell> gridCells = new Dictionary<int, GridCell>();
+        [SerializeField, EditorReadOnly] private List<RectTransform> children = new List<RectTransform>();
 
         [Header("Debug")]
         public bool forceUpdate = false;

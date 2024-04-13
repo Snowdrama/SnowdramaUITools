@@ -148,9 +148,10 @@ namespace Snowdrama.UI
 
             for (int i = 0; i < gridCells.Keys.Count; i++)
             {
+                Debug.Log($"Chekcing for Key {i} in gridCells: {!gridCells.ContainsKey(i)}");
                 if (!gridCells.ContainsKey(i))
                 {
-                    Debug.LogErrorFormat("Grid cells skip index {0}!", i);
+                    Debug.LogError($"gridCells doesn't contain {i}!");
                     Debug.Log("Skipped Cells", this.gameObject);
                     break;
                 }

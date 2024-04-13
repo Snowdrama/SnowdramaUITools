@@ -5,20 +5,20 @@ using UnityEngine;
 
 namespace Snowdrama.UI
 {
+    [System.Serializable]
+    public struct GridCell
+    {
+        public Color color;
+        public int cellId;
+        public int width;
+        public int height;
+        //unity uses for anchors
+        public Vector2Int bottomLeftCell;
+        public Vector2Int topRightCell;
+    }
     [ExecuteInEditMode]
     public class UIImageGridLayout : MonoBehaviour
     {
-        [System.Serializable]
-        public struct GridCell
-        {
-            public Color color;
-            public int cellId;
-            public int width;
-            public int height;
-            //unity uses for anchors
-            public Vector2Int bottomLeftCell;
-            public Vector2Int topRightCell;
-        }
 
         public Sprite palette;
         public Sprite styleSprite;
@@ -40,12 +40,12 @@ namespace Snowdrama.UI
 
         [Header("Debug")]
         public bool forceUpdate = false;
-        
-        [SerializeField, EditorReadOnly] private List<Color> debugPaletteKeys = new List<Color>();
-        [SerializeField, EditorReadOnly] private List<int> debugPaletteValues = new List<int>();
 
-        [SerializeField, EditorReadOnly] private List<int> debugKeys = new List<int>();
-        [SerializeField, EditorReadOnly] private List<GridCell> debugCells = new List<GridCell>();
+        [SerializeField] private List<Color> debugPaletteKeys = new List<Color>();
+        [SerializeField] private List<int> debugPaletteValues = new List<int>();
+
+        [SerializeField] private List<int> debugKeys = new List<int>();
+        [SerializeField] private List<GridCell> debugCells = new List<GridCell>();
 
 #if UNITY_EDITOR
         // Start is called before the first frame update
@@ -57,7 +57,7 @@ namespace Snowdrama.UI
         // Update is called once per frame
         void Update()
         {
-            if (forceUpdate || transform.childCount != children.Count)
+            if (forceUpdate)
             {
                 UpdateGrid();
             }

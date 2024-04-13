@@ -15,6 +15,9 @@ namespace Snowdrama.UI
         //unity uses for anchors
         public Vector2Int bottomLeftCell;
         public Vector2Int topRightCell;
+
+        public Vector2Int calculatedBottomLeft;
+        public Vector2Int calculatedTopRight;
     }
     [ExecuteInEditMode]
     public class UIImageGridLayout : MonoBehaviour
@@ -146,16 +149,16 @@ namespace Snowdrama.UI
             debugKeys = new List<int>(gridCells.Keys);
             debugCells = new List<GridCell>(gridCells.Values);
 
-            for (int i = 0; i < gridCells.Keys.Count; i++)
-            {
-                Debug.Log($"Chekcing for Key {i} in gridCells: {!gridCells.ContainsKey(i)}");
-                if (!gridCells.ContainsKey(i))
-                {
-                    Debug.LogError($"gridCells doesn't contain {i}!");
-                    Debug.Log("Skipped Cells", this.gameObject);
-                    break;
-                }
-            }
+            //for (int i = 0; i < gridCells.Keys.Count; i++)
+            //{
+            //    Debug.Log($"Chekcing for Key {i} in gridCells: {!gridCells.ContainsKey(i)}");
+            //    if (!gridCells.ContainsKey(i))
+            //    {
+            //        Debug.LogError($"gridCells doesn't contain {i}!");
+            //        Debug.Log("Skipped Cells", this.gameObject);
+            //        break;
+            //    }
+            //}
 
             children.Clear();
             foreach (Transform child in transform)
@@ -169,6 +172,15 @@ namespace Snowdrama.UI
                 {
                     GridCell cell = gridCells[i];
 
+                    cell.calculatedBottomLeft = new Vector2Int(
+                        Mathf.RoundToInt(cell.bottomLeftCell.x * percentWidthCell),
+                        Mathf.RoundToInt(cell.bottomLeftCell.y * percentHeightCell)
+                        );
+                    cell.calculatedTopRight = new Vector2Int(
+                        Mathf.RoundToInt(cell.topRightCell.x * percentWidthCell),
+                        Mathf.RoundToInt(cell.topRightCell.y * percentHeightCell)
+                        );
+                    gridCells[i] = cell;
                     children[i].anchorMin = new Vector2(
                         cell.bottomLeftCell.x * percentWidthCell,
                         cell.bottomLeftCell.y * percentHeightCell
